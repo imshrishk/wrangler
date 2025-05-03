@@ -64,6 +64,8 @@ directive
     | stringList
     | numberRanges
     | properties
+    | byteSize
+    | timeDuration
   )*?
   ;
 
@@ -140,7 +142,15 @@ numberRange
  ;
 
 value
- : String | Number | Column | Bool
+ : String | Number | Column | Bool | BYTE_SIZE | TIME_DURATION
+ ;
+
+byteSize
+ : BYTE_SIZE
+ ;
+
+timeDuration
+ : TIME_DURATION
  ;
 
 ecommand
@@ -195,6 +205,40 @@ identifierList
  : Identifier (',' Identifier)*
  ;
 
+/* 
+ * Byte size unit token
+ * Formats: 10B, 15KB, 2.5MB, 1GB, 0.5TB, 3PB 
+ */
+BYTE_SIZE
+ : Digit+ ('.' Digit+)? ByteUnit
+ ;
+
+fragment ByteUnit
+ : 'B'
+ | 'KB' | 'kb' | 'Kb' | 'kB'
+ | 'MB' | 'mb' | 'Mb' | 'mB'
+ | 'GB' | 'gb' | 'Gb' | 'gB'
+ | 'TB' | 'tb' | 'Tb' | 'tB'
+ | 'PB' | 'pb' | 'Pb' | 'pB'
+ ;
+
+/*
+ * Time duration unit token
+ * Formats: 10ns, 20us, 100ms, 5s, 10m, 2h, 1d
+ */
+TIME_DURATION
+ : Digit+ ('.' Digit+)? TimeUnit
+ ;
+
+fragment TimeUnit
+ : 'ns'
+ | 'us' | 'µs'
+ | 'ms'
+ | 's'
+ | 'm'
+ | 'h'
+ | 'd'
+ ;
 
 /*
  * Following are the Lexer Rules used for tokenizing the recipe.
@@ -295,14 +339,6 @@ UnicodeEscape
 fragment
    HexDigit : ('0'..'9'|'a'..'f'|'A'..'F') ;
 
-Comment
- : ('//' ~[\r\n]* | '/*' .*? '*/' | '--' ~[\r\n]* ) -> skip
- ;
-
-Space
- : [ \t\r\n\u000C]+ -> skip
- ;
-
 fragment Int
  : '-'? [1-9] Digit* [L]*
  | '0'
@@ -310,4 +346,12 @@ fragment Int
 
 fragment Digit
  : [0-9]
+ ;
+
+Comment
+ : ('//' ~[\r\n]* | '/*' .*? '*/' | '--' ~[\r\n]* ) -> skip
+ ;
+
+Space
+ : [ \t\r\n\u000C]+ -> skip
  ;
