@@ -216,3 +216,125 @@ Cask is a trademark of Cask Data, Inc. All rights reserved.
 
 Apache, Apache HBase, and HBase are trademarks of The Apache Software Foundation. Used with
 permission. No endorsement by The Apache Software Foundation is implied by the use of these marks.
+
+## Enhanced Byte Size and Time Duration Units Parsers
+
+Native support for byte size and time duration units in Wrangler recipes, simplifying data size and time interval transformations.
+
+### Byte Size Parser
+Recognizes values with byte units (B, KB/K, MB/M, GB/G, TB/T, PB/P).
+```
+10B      → 10 bytes
+1.5KB    → 1.5 kilobytes
+2M       → 2 megabytes
+```
+
+### Time Duration Parser
+Recognizes values with time units (ns, μs, ms, s/sec, m/min, h/hr, d/day).
+```
+250ms    → 250 milliseconds
+1.5s     → 1.5 seconds
+30min    → 30 minutes
+```
+
+### New Directive: aggregate-stats
+```
+aggregate-stats :byte_size_column :time_duration_column target_size_column target_time_column [size_unit] [time_unit] [aggregation_type]
+```
+
+**Parameters:**
+- `:byte_size_column` - Source column with byte sizes
+- `:time_duration_column` - Source column with time durations
+- `target_size_column` - Output column for aggregated size
+- `target_time_column` - Output column for aggregated time
+- `size_unit` (optional) - Output unit (default: MB)
+- `time_unit` (optional) - Output unit (default: s)
+- `aggregation_type` (optional) - total, average, min, max, percentile_N (default: total)
+
+**Aggregation Types:**
+- `total` - Calculates the sum of all values (default)
+- `average` - Calculates the mean value
+- `min` - Finds the minimum value
+- `max` - Finds the maximum value
+- `percentile_N` - Calculates the Nth percentile (e.g., percentile_90 for 90th percentile)
+
+**Examples:**
+```
+// Total aggregation (default) with default units (MB and seconds)
+aggregate-stats :data_size :response_time total_size_mb total_time_sec
+
+// Average aggregation with custom units
+aggregate-stats :data_size :response_time avg_size avg_time GB min average
+
+// Minimum values
+aggregate-stats :data_size :response_time min_size min_time KB ms min
+
+// Maximum values
+aggregate-stats :data_size :response_time max_size max_time GB s max
+
+// Percentile calculation (90th percentile)
+aggregate-stats :data_size :response_time p90_size p90_time MB ms percentile_90
+
+// Percentile calculation (median/50th percentile)
+aggregate-stats :data_size :response_time median_size median_time KB s percentile_50
+```
+
+### Running Tests
+
+```bash
+# Run tests(these will give error as those tests are not present for all folders, refer to Run specific tests to verify functionality section below to check)
+mvn test -Dtest=ByteSizeTest
+mvn test -Dtest=TimeDurationTest
+mvn test -Dtest=AggregateStatsTest
+```
+
+### Build Instructions
+
+To build the project successfully after cloning from GitHub, follow these steps:
+
+1. **Clean the project and resolve duplicate implementations**
+   
+   When working with the codebase, you might encounter duplicate implementations of classes like `ByteSize` and `TimeDuration`. If you encounter a `java.lang.NoSuchFieldError: BYTE_SIZE` or similar errors:
+   
+   ```bash
+   # Check for duplicate implementations
+   dir -r -i ByteSize.java
+   dir -r -i TimeDuration.java
+   
+   # If duplicates exist in both wrangler-api and wrangler-core, remove them from wrangler-core
+   # The API implementation should be the source of truth
+   ```
+
+2. **Build the entire project**
+   
+   ```bash
+   # Build without running tests
+   mvn clean install -DskipTests
+   ```
+
+3. **Run specific tests to verify functionality**
+   
+   ```bash
+   # Option 1: Navigate to the specific module (recommended)
+   cd wrangler-core
+   mvn test "-Dtest=io.cdap.wrangler.parser.ByteSizeTest"
+   mvn test "-Dtest=io.cdap.wrangler.parser.TimeDurationTest"
+   
+   # Option 2: Run from the root directory (requires full package name)
+   mvn test "-Dtest=io.cdap.wrangler.parser.ByteSizeTest"
+   
+   # Option 3: Use the provided scripts
+   # PowerShell
+   ./run-tests.ps1 -TestName ByteSizeTest -Module wrangler-core
+   
+   # Or Batch
+   run-tests.bat ByteSizeTest wrangler-core
+   
+   # Run multiple tests together
+   mvn test "-Dtest=io.cdap.wrangler.parser.ByteSizeTest,io.cdap.wrangler.parser.TimeDurationTest"
+   ```
+
+### Grammar Updates
+The grammar now supports flexible specification of byte sizes and time durations:
+- **ByteSize**: Standard units (10B, 1.5KB) and abbreviated units (10K, 1.5M)
+- **TimeDuration**: Basic units (10ms, 5s), full names (seconds, minutes), and abbreviations (sec, min)
