@@ -1,0 +1,33 @@
+Write/enhance tests for the following and make my code better with proper formatting and edge cases
+
+It is running correctly with
+cd wrangler-core
+mvn test "-Dtest=io.cdap.wrangler.parser.ByteSizeTest"
+But if I run just mvn test -Dtest=ByteSizeTest on cd wrangler it fails.
+Tell me how to fix it.
+
+# 
+# Copyright © 2025 CDAP
+#
+# Licensed under the Apache License, Version 2.0 (the "License"); you may not
+# use this file except in compliance with the License. You may obtain a copy of
+# the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+# WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+# License for the specific language governing permissions and limitations under
+# the License.
+#
+Is this what I should add?
+
+tell me what needs to change in the whole thing or anything that needs repolish 
+or any alteration or is just missing that need to be added. Be very detailed in
+the analysis and make sure to provide full context on why and how you came up
+with the decision. Tell me how it will affect my code and why not adding them is
+bad for my implementation.
+
+Is there any redundent code? If yes, where? Tell me how to remove them without
+compromising on any other part of my code.
