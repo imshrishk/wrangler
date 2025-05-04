@@ -55,7 +55,7 @@ public class ByteSizeTest {
     ByteSize b = new ByteSize("1024KB");
     Assert.assertEquals(1, b.toMB(), 0.00001);
     Assert.assertEquals(1024, b.toKB(), 0.00001);
-    Assert.assertEquals(0.001, b.toGB(), 0.00001);
+    Assert.assertEquals(9.765625E-4, b.toGB(), 0.00001);
     
     Assert.assertEquals(1024, b.to("KB"), 0.00001);
     Assert.assertEquals(1, b.to("MB"), 0.00001);
